@@ -6,7 +6,7 @@
     "@react-navigation/bottom-tabs": "^7.18.10",
     "@react-navigation/native": "^7.3.10",
     "@react-navigation/stack": "^7.10.13",
-    "expo": "~57.0.6",
+    "expo": "~57.0.7",
     "expo-status-bar": "~57.0.1",
     "firebase": "^12.16.0",
     "react": "^19.2.3",
