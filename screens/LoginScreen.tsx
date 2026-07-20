@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, ImageBackground, StyleSheet, } from "react-native";
-import { ref, get } from "firebase/database";
-import { db } from "../firebase/Config";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/Config";
 
 export default function LoginScreen({ navigation }: any) {
 
@@ -9,38 +9,44 @@ export default function LoginScreen({ navigation }: any) {
   const [password, setPassword] = useState("");
 
   async function iniciarSesion() {
-    if (correo === "" || password === "") {
-      Alert.alert("Error", "Complete todos los campos");
+    if (correo.trim() === "" || password.trim() === "") {
+      Alert.alert("Campos vacíos", "Complete todos los campos.");
       return;
     }
-    const referencia = ref(db, "usuarios");
-    const respuesta = await get(referencia);
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        correo,
+        password
+      );
+      Alert.alert("Bienvenido", "Inicio de sesión exitoso.",
+        [{
+          text: "Continuar", onPress: () => navigation.replace("SeleccionPersonaje"),
+        },
+        ]);
+    } catch (error: any) {
+      switch (error.code) {
+        case "auth/invalid-credential":
+          Alert.alert("Error", "Correo o contraseña incorrectos.");
+          break;
+        case "auth/user-not-found":
+          Alert.alert("Error", "El usuario no existe.");
+          break;
+        case "auth/wrong-password":
+          Alert.alert("Error", "Contraseña incorrecta.");
+          break;
+        case "auth/invalid-email":
+          Alert.alert("Error", "Correo electrónico inválido.");
+          break;
 
-    if (!respuesta.exists()) {
-      Alert.alert("Error", "No existen usuarios registrados");
-      return;
-    }
-
-    const usuarios = respuesta.val();
-    let encontrado = false;
-
-    for (const id in usuarios) {
-      if (
-        usuarios[id].correo === correo &&
-        usuarios[id].password === password
-      ) {
-        encontrado = true;
-        Alert.alert("Bienvenido", usuarios[id].nombre);
-        navigation.replace("SeleccionPersonaje");
-        break;
+        default:
+          Alert.alert("Error", error.message);
       }
-    }
-    if (!encontrado) {
-      Alert.alert("Error", "Correo o contraseña incorrectos");
     }
   }
 
   return (
+
     <ImageBackground
       source={require("../assets/login.jpg")}
       style={styles.fondo}
@@ -55,6 +61,8 @@ export default function LoginScreen({ navigation }: any) {
           style={styles.input}
           value={correo}
           onChangeText={setCorreo}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
         <TextInput
           placeholder="Contraseña"
@@ -92,16 +100,16 @@ const styles = StyleSheet.create({
   },
   caja: {
     width: "90%",
-    backgroundColor: "rgba(0,0,0,0.8)",
+    backgroundColor: "rgba(0,0,0,0.82)",
     padding: 25,
-    borderRadius: 20
+    borderRadius: 20,
   },
   titulo: {
     fontSize: 34,
     color: "#ff1f4b",
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 30
+    marginBottom: 30,
   },
   input: {
     backgroundColor: "#222",
@@ -110,23 +118,23 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 18,
     borderWidth: 1,
-    borderColor: "#ff1f4b"
+    borderColor: "#ff1f4b",
   },
   boton: {
     backgroundColor: "#ff1f4b",
     padding: 16,
     borderRadius: 15,
-    marginTop: 10
+    marginTop: 10,
   },
   textoBoton: {
     color: "white",
     textAlign: "center",
     fontWeight: "bold",
-    fontSize: 18
+    fontSize: 18,
   },
   link: {
     color: "white",
     textAlign: "center",
-    marginTop: 25
-  }
+    marginTop: 25,
+  },
 });
