@@ -1,4 +1,4 @@
-// Importa lo necesario
+// Tu código actual está perfecto, solo asegúrate de exportar 'db'
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";
@@ -13,10 +13,6 @@ const firebaseConfig = {
     appId: "1:432745755728:web:75a2ee29488cc14dc10d55"
 };
 
-
 const app = initializeApp(firebaseConfig);
-
-
 export const db = getDatabase(app);
-// Firebase Authentication
 export const auth = getAuth(app);

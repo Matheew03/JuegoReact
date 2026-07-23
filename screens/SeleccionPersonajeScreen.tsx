@@ -5,7 +5,7 @@ import { db } from "../firebase/Config";
 import { ref, set } from "firebase/database";
 import CardPersonaje from "../Components/CardPersonaje";
 
-export default function SeleccionPersonajeScreen({ navigation } : any) {
+export default function SeleccionPersonajeScreen({ navigation }: any) {
   const [selected, setSelected] = useState<Personaje | null>(null);
 
   const handleSelect = async (p: Personaje) => {
@@ -23,8 +23,9 @@ export default function SeleccionPersonajeScreen({ navigation } : any) {
       console.error("Error guardando personaje:", error);
     }
 
-    navigation.navigate("AtrapaSombras", {
-      screen: "Juego",
+    // 👉 Aquí usamos replace para ir directo al Tab Navigator
+    navigation.replace("Tabs", {
+      screen: "Game",
       params: { personaje: p },
     });
   };
@@ -49,11 +50,5 @@ export default function SeleccionPersonajeScreen({ navigation } : any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "black", padding: 20 },
-  title: {
-    color: "red",
-    fontSize: 26,
-    marginBottom: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
+  title: { color: "red", fontSize: 26, marginBottom: 20, fontWeight: "bold", textAlign: "center" },
 });

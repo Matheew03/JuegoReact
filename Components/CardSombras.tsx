@@ -1,12 +1,12 @@
 import React from "react";
-import { TouchableOpacity, StyleSheet, Image } from "react-native";
+import { TouchableOpacity, StyleSheet, Image, ImageSourcePropType } from "react-native";
 
 const SIZE = 80;
 
 type CardSombrasProps = {
     onCatch: () => void;
     active: boolean;
-    image: any;
+    image: ImageSourcePropType;
     top: number;
     left: number;
 };
@@ -14,14 +14,11 @@ type CardSombrasProps = {
 export default function CardSombras({ onCatch, active, image, top, left }: CardSombrasProps) {
     if (!active) return null;
 
-    const handlePress = () => {
-        onCatch();
-    };
-
     return (
         <TouchableOpacity
-            style={[styles.shadowCard, { top, left, width: SIZE, height: SIZE }]}
-            onPress={handlePress}
+            style={[styles.shadowCard, { top, left }]}
+            onPress={onCatch}
+            activeOpacity={0.7}
         >
             <Image source={image} style={styles.image} />
         </TouchableOpacity>
@@ -31,10 +28,12 @@ export default function CardSombras({ onCatch, active, image, top, left }: CardS
 const styles = StyleSheet.create({
     shadowCard: {
         position: "absolute",
-    },
-    image: {
         width: SIZE,
         height: SIZE,
+    },
+    image: {
+        width: "100%",
+        height: "100%",
         resizeMode: "contain",
     },
 });
