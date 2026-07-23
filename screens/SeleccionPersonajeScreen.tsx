@@ -23,7 +23,7 @@ export default function SeleccionPersonajeScreen({ navigation }: any) {
       console.error("Error guardando personaje:", error);
     }
 
-    // 👉 Aquí usamos replace para ir directo al Tab Navigator
+
     navigation.replace("Tabs", {
       screen: "Game",
       params: { personaje: p },

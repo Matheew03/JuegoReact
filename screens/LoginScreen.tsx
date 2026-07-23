@@ -17,7 +17,7 @@ export default function LoginScreen({ navigation }: any) {
         const user = userCredential.user;
         console.log(user);
         Alert.alert("Bienvenido", "Inicio de sesión exitoso");
-        // 👉 Aquí cambiamos a SeleccionarPersonaje
+
         navigation.replace("SeleccionarPersonaje");
       })
       .catch((error) => {

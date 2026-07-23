@@ -3,11 +3,11 @@ import { Text, View, Dimensions, StyleSheet } from "react-native";
 import { globalStyles } from "../styles/GlobalStyles";
 import CardSombras from "../Components/CardSombras";
 import { sombras } from "../types/sombras";
+import { supabase } from "../supabase/config";
+import { auth } from "../firebase/Config";
 
 const { width, height } = Dimensions.get("window");
 const SIZE = 80;
-
-// Margen de seguridad para que no aparezcan fuera de la pantalla visible
 const MAX_TOP = height - SIZE - 100;
 const MAX_LEFT = width - SIZE - 20;
 
@@ -19,30 +19,29 @@ export default function GameScreen({ route }: any) {
             <View style={globalStyles.container}>
                 <Text>No se recibió el personaje.</Text>
             </View>
-        )
+        );
     }
 
     const [score, setScore] = useState(0);
     const [time, setTime] = useState(30);
     const [activeShadows, setActiveShadows] = useState<any[]>([]);
 
-    // Timer del juego
+
     useEffect(() => {
         if (time > 0) {
-            const timer = setInterval(() => setTime(prev => prev - 1), 1000);
+            const timer = setInterval(() => setTime((prev) => prev - 1), 1000);
             return () => clearInterval(timer);
         }
     }, [time]);
 
-    // Generador de sombras corregido
+
     useEffect(() => {
         if (time <= 0) return;
 
         const intervalo = personaje.alias === "Skull" ? 800 : 400;
 
         const interval = setInterval(() => {
-            setActiveShadows(prev => {
-                // Límite máximo de 5 sombras simultáneas
+            setActiveShadows((prev) => {
                 if (prev.length >= 5) return prev;
 
                 const nuevasSombras: any[] = [];
@@ -52,21 +51,19 @@ export default function GameScreen({ route }: any) {
                     const randomTop = Math.floor(Math.random() * MAX_TOP);
                     const randomLeft = Math.floor(Math.random() * MAX_LEFT);
 
-                    // ID único combinando tiempo, iteración y un número aleatorio
                     const shadowId = `${Date.now()}-${i}-${Math.random()}`;
 
                     const newShadow = {
                         ...randomShadow,
                         id: shadowId,
                         top: randomTop,
-                        left: randomLeft
+                        left: randomLeft,
                     };
 
                     nuevasSombras.push(newShadow);
 
-                    // Auto-eliminación después de 1 segundo
                     setTimeout(() => {
-                        setActiveShadows(current => current.filter(s => s.id !== shadowId));
+                        setActiveShadows((current) => current.filter((s) => s.id !== shadowId));
                     }, 1000);
                 }
 
@@ -75,7 +72,8 @@ export default function GameScreen({ route }: any) {
         }, intervalo);
 
         return () => clearInterval(interval);
-    }, [time, personaje.alias]); // Removido activeShadows de las dependencias
+    }, [time, personaje.alias]);
+
 
     const handleCatch = (id: string, puntos: number) => {
         let extra = puntos;
@@ -85,7 +83,7 @@ export default function GameScreen({ route }: any) {
         }
 
         if (personaje.alias === "Panther") {
-            setTime(prev => prev + 2);
+            setTime((prev) => prev + 2);
         }
 
         if (personaje.alias === "Mona") {
@@ -94,9 +92,29 @@ export default function GameScreen({ route }: any) {
             }
         }
 
-        setScore(prev => prev + extra);
-        setActiveShadows(prev => prev.filter(s => s.id !== id));
+        setScore((prev) => prev + extra);
+        setActiveShadows((prev) => prev.filter((s) => s.id !== id));
     };
+
+    useEffect(() => {
+        if (time === 0) {
+            const guardarPuntaje = async () => {
+                const { error } = await supabase.from("scores").insert([
+                    {
+                        usuario: auth.currentUser?.email || personaje.alias,
+                        puntaje: score,
+                        fecha: new Date().toISOString(),
+                    },
+                ]);
+                if (error) {
+                    console.error(" Error guardando puntaje:", error);
+                } else {
+                    console.log("Puntaje guardado en Supabase:", score);
+                }
+            };
+            guardarPuntaje();
+        }
+    }, [time]);
 
     return (
         <View style={globalStyles.container}>
@@ -108,7 +126,7 @@ export default function GameScreen({ route }: any) {
             </View>
 
             <View style={{ flex: 1, position: "relative" }}>
-                {activeShadows.map(sombra => (
+                {activeShadows.map((sombra) => (
                     <CardSombras
                         key={sombra.id}
                         onCatch={() => handleCatch(sombra.id, sombra.puntos)}
