@@ -1,52 +1,54 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, ImageBackground, StyleSheet, } from "react-native";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {  View,  Text,  TextInput,  TouchableOpacity,  Alert,  ImageBackground,  StyleSheet,} from "react-native";
+import {  sendPasswordResetEmail,  signInWithEmailAndPassword} from "firebase/auth";
 import { auth } from "../firebase/Config";
 
 export default function LoginScreen({ navigation }: any) {
 
-  const [correo, setCorreo] = useState("");
-  const [password, setPassword] = useState("");
+  const [correo, setcorreo] = useState("");
+  const [contrasenia, setcontrasenia] = useState("");
 
-  async function iniciarSesion() {
-    if (correo.trim() === "" || password.trim() === "") {
-      Alert.alert("Campos vacíos", "Complete todos los campos.");
+  function login() {
+    if (correo.trim() === "" || contrasenia.trim() === "") {
+      Alert.alert("Campos vacíos","Complete todos los campos");
       return;
     }
-    try {
-      await signInWithEmailAndPassword(
-        auth,
-        correo,
-        password
-      );
-      Alert.alert("Bienvenido", "Inicio de sesión exitoso.",
-        [{
-          text: "Continuar", onPress: () => navigation.replace("SeleccionPersonaje"),
-        },
-        ]);
-    } catch (error: any) {
-      switch (error.code) {
-        case "auth/invalid-credential":
-          Alert.alert("Error", "Correo o contraseña incorrectos.");
-          break;
-        case "auth/user-not-found":
-          Alert.alert("Error", "El usuario no existe.");
-          break;
-        case "auth/wrong-password":
-          Alert.alert("Error", "Contraseña incorrecta.");
-          break;
-        case "auth/invalid-email":
-          Alert.alert("Error", "Correo electrónico inválido.");
-          break;
-
-        default:
-          Alert.alert("Error", error.message);
-      }
-    }
+    signInWithEmailAndPassword(auth,correo,contrasenia)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user);
+        Alert.alert("Bienvenido","Inicio de sesión exitoso");
+        navigation.navigate("Tabs");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode);
+        if (errorCode == "auth/invalid-email") {
+          Alert.alert("Correo inválido","Verificar el campo de correo");
+        } else if (errorCode == "auth/missing-password") {
+          Alert.alert("Contraseña incorrecta","Verificar el campo de contraseña");
+        } else if (errorCode == "auth/invalid-credential") {
+          Alert.alert("Error","Verifica tus credenciales");
+        } else {
+          Alert.alert("Error", errorMessage);
+        }
+      });
   }
 
+  function restablecerContrasenia() {
+    sendPasswordResetEmail(auth,correo)
+      .then(() => {
+        Alert.alert("Mensaje", "Se envió un mensaje a tu correo");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode);
+        Alert.alert("Error", errorMessage);
+      });
+  }
   return (
-
     <ImageBackground
       source={require("../assets/login.jpg")}
       style={styles.fondo}
@@ -56,25 +58,21 @@ export default function LoginScreen({ navigation }: any) {
           LOGIN
         </Text>
         <TextInput
-          placeholder="Correo"
+          placeholder="Ingresar Correo"
           placeholderTextColor="#bbb"
           style={styles.input}
-          value={correo}
-          onChangeText={setCorreo}
-          keyboardType="email-address"
-          autoCapitalize="none"
+          onChangeText={setcorreo}
         />
         <TextInput
-          placeholder="Contraseña"
+          placeholder="Ingresar Contraseña"
           placeholderTextColor="#bbb"
           secureTextEntry
           style={styles.input}
-          value={password}
-          onChangeText={setPassword}
+          onChangeText={setcontrasenia}
         />
         <TouchableOpacity
           style={styles.boton}
-          onPress={iniciarSesion}
+          onPress={login}
         >
           <Text style={styles.textoBoton}>
             Ingresar
@@ -85,6 +83,13 @@ export default function LoginScreen({ navigation }: any) {
         >
           <Text style={styles.link}>
             ¿No tienes cuenta? Registrarse
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={restablecerContrasenia}
+        >
+          <Text style={styles.link}>
+            ¿Olvidaste la contraseña?
           </Text>
         </TouchableOpacity>
       </View>

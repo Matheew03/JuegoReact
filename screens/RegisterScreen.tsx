@@ -3,79 +3,94 @@ import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "reac
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/Config";
 
+
 export default function RegisterScreen({ navigation }: any) {
 
-  const [correo, setCorreo] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmar, setConfirmar] = useState("");
+  const [correo, setcorreo] = useState("");
+  const [contrasenia, setcontrasenia] = useState("");
+  const [confirmar, setconfirmar] = useState("");
 
-  async function registrarUsuario() {
-
+  function registro() {
     if (
       correo.trim() == "" ||
-      password.trim() == "" ||
+      contrasenia.trim() == "" ||
       confirmar.trim() == ""
     ) {
       Alert.alert("Campos vacíos", "Complete toda la información.");
       return;
     }
-    if (password != confirmar) {
+    if (contrasenia != confirmar) {
       Alert.alert("Error", "Las contraseñas no coinciden.");
       return;
     }
-    try {
-      await createUserWithEmailAndPassword(
-        auth,
-        correo,
-        password
-      );
-      Alert.alert("Éxito", "Usuario registrado correctamente.",
-        [{
-          text: "Aceptar", onPress: () => navigation.navigate("Login")
-        }]);
-    } catch (error: any) {
-      Alert.alert("Error", error.message);
-    }
-  }
 
+    createUserWithEmailAndPassword(auth, correo, contrasenia)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user);
+        Alert.alert("Éxito", "Usuario registrado correctamente.",
+          [{
+            text: "Aceptar",
+            onPress: () => navigation.navigate("Login")
+          }]);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode);
+
+        if (errorCode == "auth/email-already-in-use") {
+          Alert.alert( "Correo existente", "Este correo ya está registrado.");
+        } else if (errorCode == "auth/invalid-email") {
+          Alert.alert( "Correo inválido", "Ingrese un correo válido.");
+        } else if (errorCode == "auth/weak-password") {
+          Alert.alert( "Contraseña débil", "La contraseña debe tener más seguridad.");
+        } else {
+          Alert.alert( "Error", errorMessage);
+        }
+      });
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>
-        Registro de Cazador
+        Registro
       </Text>
+
       <TextInput
         placeholder="Correo electrónico"
         placeholderTextColor="#999"
         style={styles.input}
-        value={correo}
-        onChangeText={setCorreo}
+        onChangeText={setcorreo}
         keyboardType="email-address"
         autoCapitalize="none"
       />
+
       <TextInput
         placeholder="Contraseña"
         placeholderTextColor="#999"
         style={styles.input}
-        value={password}
-        onChangeText={setPassword}
+        onChangeText={setcontrasenia}
         secureTextEntry
       />
+
       <TextInput
         placeholder="Confirmar contraseña"
         placeholderTextColor="#999"
         style={styles.input}
-        value={confirmar}
-        onChangeText={setConfirmar}
+        onChangeText={setconfirmar}
         secureTextEntry
       />
+
       <TouchableOpacity
         style={styles.boton}
-        onPress={registrarUsuario}
+        onPress={registro}
       >
+
         <Text style={styles.textoBoton}>
           Crear Cuenta
         </Text>
       </TouchableOpacity>
+
       <TouchableOpacity
         onPress={() => navigation.navigate("Login")}
       >
