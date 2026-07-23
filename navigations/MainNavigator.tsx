@@ -10,43 +10,31 @@ import ScoreScreen from "../screens/ScoreScreen";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MainTabs() {
+function MyStack() {
     return (
-        <Tab.Navigator
-            screenOptions={{
-                headerStyle: { backgroundColor: "#485685", },
-                headerTintColor: "white",
-                tabBarActiveTintColor: "white",
-                tabBarActiveBackgroundColor: "#485685",
-                tabBarStyle: { backgroundColor: "#535c7a", },
-            }}
-        >
-            <Tab.Screen name="Juego" component={GameScreen} />
-            <Tab.Screen name="Puntuaciones" component={ScoreScreen} />
-        </Tab.Navigator>
-    );
+        <Stack.Navigator screenOptions={{headerShown:false}}>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Registro" component={RegisterScreen} />
+            <Stack.Screen name="SeleccionarPersonaje" component={SeleccionPersonajeScreen}/>
+            <Stack.Screen name="Tabs" component={MyTabs} />
+        </Stack.Navigator>
+    )
 }
 
-export function MainNavigator() {
-    return (
-        <NavigationContainer>
+function MyTabs(){
+    return(
+        <Tab.Navigator>
+            
+            <Tab.Screen name="Game" component={GameScreen}/>
+            <Tab.Screen name="Score" component={ScoreScreen}/>
+        </Tab.Navigator>
+    )
+}
 
-            <Stack.Navigator
-                initialRouteName="Login"
-                screenOptions={{
-                    headerStyle: { backgroundColor: "#485685", },
-                    headerTintColor: "white",
-                }}
-            >
-                <Stack.Screen name="Login" component={LoginScreen} />
-                <Stack.Screen name="Registro" component={RegisterScreen} />
-                <Stack.Screen name="SeleccionPersonaje" component={SeleccionPersonajeScreen} />
-                <Stack.Screen name="AtrapaSombras" component={MainTabs}
-                    options={{
-                        headerShown: false,
-                    }}
-                />
-            </Stack.Navigator>
+export function Navegador(){
+    return(
+        <NavigationContainer>
+            <MyStack/>
         </NavigationContainer>
-    );
+    )
 }
