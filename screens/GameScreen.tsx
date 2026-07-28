@@ -1,15 +1,12 @@
 import { useEffect, useState } from "react";
-import { Text, View, Dimensions, StyleSheet } from "react-native";
+import { Text, View, StyleSheet } from "react-native"; // Quitado Dimensions
 import { globalStyles } from "../styles/GlobalStyles";
 import CardSombras from "../Components/CardSombras";
 import { sombras } from "../types/sombras";
 import { supabase } from "../supabase/config";
 import { auth } from "../firebase/Config";
 
-const { width, height } = Dimensions.get("window");
 const SIZE = 80;
-const MAX_TOP = height - SIZE - 100;
-const MAX_LEFT = width - SIZE - 20;
 
 export default function GameScreen({ route }: any) {
     const personaje = route?.params?.personaje;
@@ -26,6 +23,8 @@ export default function GameScreen({ route }: any) {
     const [time, setTime] = useState(30);
     const [activeShadows, setActiveShadows] = useState<any[]>([]);
 
+    const [gameArea, setGameArea] = useState({ width: 0, height: 0 });
+
 
     useEffect(() => {
         if (time > 0) {
@@ -38,6 +37,8 @@ export default function GameScreen({ route }: any) {
     useEffect(() => {
         if (time <= 0) return;
 
+        if (gameArea.width === 0 || gameArea.height === 0) return;
+
         const intervalo = personaje.alias === "Skull" ? 800 : 400;
 
         const interval = setInterval(() => {
@@ -48,8 +49,13 @@ export default function GameScreen({ route }: any) {
 
                 for (let i = 0; i < 2; i++) {
                     const randomShadow = sombras[Math.floor(Math.random() * sombras.length)];
-                    const randomTop = Math.floor(Math.random() * MAX_TOP);
-                    const randomLeft = Math.floor(Math.random() * MAX_LEFT);
+
+
+                    const maxTop = gameArea.height - SIZE;
+                    const maxLeft = gameArea.width - SIZE;
+
+                    const randomTop = Math.max(0, Math.floor(Math.random() * maxTop));
+                    const randomLeft = Math.max(0, Math.floor(Math.random() * maxLeft));
 
                     const shadowId = `${Date.now()}-${i}-${Math.random()}`;
 
@@ -72,7 +78,7 @@ export default function GameScreen({ route }: any) {
         }, intervalo);
 
         return () => clearInterval(interval);
-    }, [time, personaje.alias]);
+    }, [time, personaje.alias, gameArea]); 
 
 
     const handleCatch = (id: string, puntos: number) => {
@@ -82,14 +88,19 @@ export default function GameScreen({ route }: any) {
             extra = puntos * 2;
         }
 
-        if (personaje.alias === "Panther") {
-            setTime((prev) => prev + 2);
-        }
-
         if (personaje.alias === "Mona") {
             if (Math.random() < 0.5) {
                 extra = puntos * 1.5;
             }
+        }
+
+        if (personaje.alias === "Panther" && Math.random() < 0.30) {
+            setActiveShadows((prev) => {
+                const puntosTotalesPantalla = prev.reduce((total, s) => total + (s.puntos || 0), 0);
+                setScore((scorePrev) => scorePrev + puntosTotalesPantalla);
+                return [];
+            });
+            return;
         }
 
         setScore((prev) => prev + extra);
@@ -125,7 +136,14 @@ export default function GameScreen({ route }: any) {
                 <Text style={globalStyles.scoreText}>Tiempo: {time}</Text>
             </View>
 
-            <View style={{ flex: 1, position: "relative" }}>
+
+            <View
+                style={{ flex: 1, position: "relative", width: "100%" }}
+                onLayout={(event) => {
+                    const { width, height } = event.nativeEvent.layout;
+                    setGameArea({ width, height });
+                }}
+            >
                 {activeShadows.map((sombra) => (
                     <CardSombras
                         key={sombra.id}

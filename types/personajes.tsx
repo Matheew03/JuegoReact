@@ -25,7 +25,7 @@ export const personajes: Personaje[] = [
         id: 3,
         nombre: "Ann Takamaki",
         alias: "Panther",
-        habilidad: "Atrapar sombras otorga tiempo extra",
+        habilidad: "30% de probabilidad de quemar y atrapar todas las sombras en pantalla",
         image: require("../assets/phantom thieves/panther.png"),
     },
     {

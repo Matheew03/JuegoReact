@@ -1,4 +1,4 @@
-// Tu código actual está perfecto, solo asegúrate de exportar 'db'
+
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";
