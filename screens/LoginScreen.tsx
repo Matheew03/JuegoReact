@@ -59,7 +59,7 @@ export default function LoginScreen({ navigation }: any) {
   }
 
   return (
-    <ImageBackground source={require("../assets/icon.png")} style={styles.fondo}>
+    <ImageBackground source={require("../assets/fondojuego.jpg")} style={styles.fondo}>
       <View style={styles.caja}>
         <Text style={styles.titulo}>LOGIN</Text>
         <TextInput
