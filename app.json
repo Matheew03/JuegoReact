@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Taller1",
-    "slug": "Taller1",
+    "name": "Persona 5",
+    "slug": "persona5",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/iconop5.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
