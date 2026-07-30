@@ -1,13 +1,27 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, ImageBackground, StyleSheet } from "react-native";
 import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
+import { useAudioPlayer } from "expo-audio";
 import { auth } from "../firebase/Config";
+
+const buttonSound = require("../assets/sounds/button.mp3");
+const button2Sound = require("../assets/sounds/button2.mp3");
 
 export default function LoginScreen({ navigation }: any) {
   const [correo, setcorreo] = useState("");
   const [contrasenia, setcontrasenia] = useState("");
 
+  const buttonPlayer = useAudioPlayer(buttonSound);
+  const button2Player = useAudioPlayer(button2Sound);
+
+  const playSound = (player: ReturnType<typeof useAudioPlayer>) => {
+    player.seekTo(0);
+    player.play();
+  };
+
   function login() {
+    playSound(button2Player);
+
     if (correo.trim() === "" || contrasenia.trim() === "") {
       Alert.alert("Campos vacíos", "Complete todos los campos");
       return;
@@ -36,6 +50,8 @@ export default function LoginScreen({ navigation }: any) {
   }
 
   function restablecerContrasenia() {
+    playSound(buttonPlayer);
+
     if (correo.trim() === "") {
       Alert.alert("Campo requerido", "Por favor, ingresa tu correo electrónico para restablecer la contraseña.");
       return;
@@ -57,6 +73,11 @@ export default function LoginScreen({ navigation }: any) {
         }
       });
   }
+
+  const handleGoToRegistro = () => {
+    playSound(buttonPlayer);
+    navigation.navigate("Registro");
+  };
 
   return (
     <ImageBackground source={require("../assets/fondojuego.jpg")} style={styles.fondo}>
@@ -83,7 +104,7 @@ export default function LoginScreen({ navigation }: any) {
         <TouchableOpacity style={styles.boton} onPress={login}>
           <Text style={styles.textoBoton}>Ingresar</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
+        <TouchableOpacity onPress={handleGoToRegistro}>
           <Text style={styles.link}>¿No tienes cuenta? Registrarse</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={restablecerContrasenia}>

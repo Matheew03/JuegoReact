@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useAudioPlayer } from "expo-audio";
 import { auth } from "../firebase/Config";
 
+const buttonSound = require("../assets/sounds/button.mp3");
+const button2Sound = require("../assets/sounds/button2.mp3");
 
 export default function RegisterScreen({ navigation }: any) {
 
@@ -10,7 +13,17 @@ export default function RegisterScreen({ navigation }: any) {
   const [contrasenia, setcontrasenia] = useState("");
   const [confirmar, setconfirmar] = useState("");
 
+  const buttonPlayer = useAudioPlayer(buttonSound);
+  const button2Player = useAudioPlayer(button2Sound);
+
+  const playSound = (player: ReturnType<typeof useAudioPlayer>) => {
+    player.seekTo(0);
+    player.play();
+  };
+
   function registro() {
+    playSound(button2Player);
+
     if (
       correo.trim() == "" ||
       contrasenia.trim() == "" ||
@@ -40,16 +53,22 @@ export default function RegisterScreen({ navigation }: any) {
         console.log(errorCode);
 
         if (errorCode == "auth/email-already-in-use") {
-          Alert.alert( "Correo existente", "Este correo ya está registrado.");
+          Alert.alert("Correo existente", "Este correo ya está registrado.");
         } else if (errorCode == "auth/invalid-email") {
-          Alert.alert( "Correo inválido", "Ingrese un correo válido.");
+          Alert.alert("Correo inválido", "Ingrese un correo válido.");
         } else if (errorCode == "auth/weak-password") {
-          Alert.alert( "Contraseña débil", "La contraseña debe tener más seguridad.");
+          Alert.alert("Contraseña débil", "La contraseña debe tener más seguridad.");
         } else {
-          Alert.alert( "Error", errorMessage);
+          Alert.alert("Error", errorMessage);
         }
       });
   }
+
+  const handleGoToLogin = () => {
+    playSound(buttonPlayer);
+    navigation.navigate("Login");
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.titulo}>
@@ -92,7 +111,7 @@ export default function RegisterScreen({ navigation }: any) {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("Login")}
+        onPress={handleGoToLogin}
       >
         <Text style={styles.link}>
           ¿Ya tienes cuenta? Inicia sesión
