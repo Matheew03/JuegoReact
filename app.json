@@ -30,11 +30,6 @@
     },
     "plugins": [
       "expo-audio"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "9413ba5b-43a7-4641-b7c1-7bce6434e6cc"
-      }
-    }
+    ]
   }
 }
