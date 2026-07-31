@@ -4,6 +4,7 @@ import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/aut
 import { useAudioPlayer } from "expo-audio";
 import { auth } from "../firebase/Config";
 
+
 const buttonSound = require("../assets/sounds/button.mp3");
 const button2Sound = require("../assets/sounds/button2.mp3");
 
@@ -80,7 +81,7 @@ export default function LoginScreen({ navigation }: any) {
   };
 
   return (
-    <ImageBackground source={require("../assets/fondojuego.jpg")} style={styles.fondo}>
+    <ImageBackground source={require("../assets/fondos.jpg")} style={styles.fondo}>
       <View style={styles.caja}>
         <Text style={styles.titulo}>LOGIN</Text>
         <TextInput
