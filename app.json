@@ -30,6 +30,12 @@
     },
     "plugins": [
       "expo-audio"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b978995c-f572-4929-84a1-ddb1ddbda044"
+      }
+    },
+    "owner": "matheew"
   }
 }
