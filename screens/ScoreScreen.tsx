@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { auth } from "../firebase/Config";
 import { supabase } from "../supabase/config";
 
@@ -10,7 +10,7 @@ const characterColors: Record<string, string> = {
   Mona: "#71d5ff",
 };
 
-export default function ScoreScreen() {
+export default function ScoreScreen({ navigation }: any) {
   const [scores, setScores] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -62,7 +62,7 @@ export default function ScoreScreen() {
         </Text>
       </View>
 
-      <FlatList
+            <FlatList
         data={scores}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
@@ -88,6 +88,16 @@ export default function ScoreScreen() {
           );
         }}
       />
+
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={() => navigation.replace("Login")}
+      >
+        <Text style={styles.logoutText}>
+          CERRAR SESIÓN
+        </Text>
+      </TouchableOpacity>
+
     </View>
   );
 }
@@ -205,5 +215,19 @@ const styles = StyleSheet.create({
     color: "#b7c8e8",
     marginTop: 30,
     textAlign: "center",
+  },
+    logoutButton: {
+    backgroundColor: "#ff1f4b",
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: "center",
+    marginBottom: 20,
+    marginTop: 10,
+  },
+
+  logoutText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

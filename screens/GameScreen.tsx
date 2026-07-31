@@ -180,7 +180,7 @@ export default function GameScreen({ route }: any) {
                 {
                     usuario: auth.currentUser?.email || personaje.alias,
                     personaje: personaje.alias,
-                    puntaje: score,
+                    puntaje: Math.round(score),
                     fecha: new Date().toISOString(),
                 },
             ]);
